@@ -6,3 +6,5 @@ out.jsonl
 dist/
 temp/
 ref_*/
+docs/demo/*.mp4
+
