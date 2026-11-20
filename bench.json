@@ -1,0 +1,26 @@
+{
+  "contract_version": "1.3",
+  "avg_fps": 300.3,
+  "p1_low_fps": 146.4,
+  "frame_ms_p95": 4.5,
+  "frames": 9008,
+  "load_ms": 1905,
+  "peak_mem_mb": null,
+  "peak_mem_note": "Bản web: không đo được RSS của các tiến trình Chromium một cách đa nền tảng từ Playwright; js_heap_peak_mb là JS heap đỉnh của trang (CDP Performance.getMetrics), không phải RSS.",
+  "js_heap_peak_mb": 39.8,
+  "vsync_off": true,
+  "vsync_note": "Chromium chạy với --disable-gpu-vsync --disable-frame-rate-limit",
+  "renderer": "ANGLE (AMD, AMD Radeon 780M Graphics (0x00001900) Direct3D11 vs_5_0 ps_5_0, D3D11) · WebGL2 · three.js r187 · Chromium 159.0.8154.6 (Playwright, có cửa sổ)",
+  "os": "Windows_NT 10.0.26300 x64 · AMD Ryzen 7 H 260 w/ Radeon 780M Graphics · 31 GB RAM",
+  "seed": 42,
+  "duration_s": 30,
+  "measured_ms": 30000,
+  "viewport": [
+    1280,
+    720
+  ],
+  "scene": {
+    "shades": 200,
+    "motes": 100
+  }
+}

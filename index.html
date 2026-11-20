@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đảo Đèn Lồng</title>
+  <style>
+    :root {
+      --warm: #ffb347;
+      --warm-soft: #ffe2a8;
+      --ink: #2a1240;
+      --panel: rgba(20, 12, 38, 0.72);
+      --text: #f6ecff;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0a1f; color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    #app, #app canvas { position: fixed; inset: 0; display: block; }
+    .hud { position: fixed; top: 12px; left: 12px; display: grid; grid-template-columns: auto auto; gap: 4px 14px;
+      padding: 10px 14px; background: var(--panel); border: 1px solid rgba(255, 179, 71, 0.25);
+      border-radius: 12px; font-size: 15px; pointer-events: none; min-width: 230px; }
+    .hud .k { opacity: 0.75; }
+    .hud .v { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+    #hud-flames { color: var(--warm); letter-spacing: 2px; }
+    .pulse { grid-column: 1 / -1; margin-top: 4px; }
+    .bar { height: 6px; background: rgba(255, 255, 255, 0.12); border-radius: 3px; overflow: hidden; margin-top: 3px; }
+    #hud-pulse-bar { height: 100%; width: 100%; background: #8a7aa8; transition: width 0.1s linear; }
+    #hud-pulse-bar.ready { background: var(--warm); }
+    #hud-hint { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); padding: 6px 14px;
+      background: var(--panel); border-radius: 999px; color: var(--warm-soft); pointer-events: none; }
+    #hud-hint:empty { display: none; }
+    .controls { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 13px; opacity: 0.7;
+      pointer-events: none; text-align: center; padding: 0 12px; }
+    .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(8, 4, 20, 0.6); }
+    .overlay[hidden] { display: none; }
+    .card { background: var(--panel); border: 1px solid rgba(255, 179, 71, 0.35); border-radius: 16px;
+      padding: 28px 32px; text-align: center; max-width: 440px; margin: 16px; }
+    .card h1 { margin: 0 0 8px; color: var(--warm); font-size: 30px; }
+    .card p { margin: 8px 0; line-height: 1.5; }
+    #end:not(.won) h1 { color: #c9a6ff; }
+    button { margin-top: 14px; font: inherit; font-weight: 600; padding: 10px 22px; border: 0; border-radius: 999px;
+      background: var(--warm); color: #2a1240; cursor: pointer; }
+    button:hover { filter: brightness(1.1); }
+    button.secondary { background: transparent; color: var(--warm); border: 1px solid var(--warm); }
+    .buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    #lb-form { margin-top: 12px; text-align: left; }
+    #lb-form .row { display: flex; gap: 8px; margin-top: 6px; }
+    #lb-form .row button { margin-top: 0; }
+    #lb-name { flex: 1; font: inherit; font-size: 18px; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(255, 179, 71, 0.5);
+      background: rgba(255, 255, 255, 0.08); color: var(--text); min-width: 0; }
+    .msg { min-height: 1.4em; font-size: 15px; }
+    .msg.error { color: #ff8a8e; }
+    .msg.ok { color: var(--warm-soft); }
+    ol.board { text-align: left; margin: 10px 0; padding-left: 28px; max-height: 50vh; overflow: auto; }
+    ol.board li { padding: 4px 0; font-variant-numeric: tabular-nums; }
+    ol.board li.me { color: var(--warm); font-weight: 700; }
+    ol.board .meta { opacity: 0.7; font-size: 14px; }
+    #error { position: fixed; top: 12px; right: 12px; max-width: 420px; padding: 10px 14px; background: #5a1630;
+      border-radius: 10px; }
+  </style>
+  <script type="importmap">
+    { "imports": { "three": "./node_modules/three/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <div class="hud" aria-live="polite">
+    <span class="k">Đom đóm</span><span class="v" id="hud-carried">0/10</span>
+    <span class="k">Lửa</span><span class="v" id="hud-flames">●●●</span>
+    <span class="k">Đèn</span><span class="v" id="hud-lanterns">0/5</span>
+    <span class="k">Thời gian</span><span class="v" id="hud-time">5:00</span>
+    <span class="k">Điểm</span><span class="v" id="hud-score">0</span>
+    <div class="pulse">
+      <span class="k">Tỏa sáng:</span> <span id="hud-pulse-text">Sẵn sàng</span>
+      <div class="bar"><div id="hud-pulse-bar"></div></div>
+    </div>
+  </div>
+  <div id="hud-hint"></div>
+  <div class="controls">WASD đi · Chuột / Q Z xoay camera · Space nhảy · Shift lướt · E nạp đèn · F tỏa sáng · R chơi lại</div>
+
+  <div class="overlay" id="start">
+    <div class="card">
+      <h1>Đảo Đèn Lồng</h1>
+      <p>Sương đen đã nuốt ánh sáng của Đảo Bến. Hãy giúp Mây nhặt đom đóm, thắp các Đèn Lồng Lớn và châm dầu để giữ ít nhất 3/5 đèn còn sáng khi bình minh tới.</p>
+      <p>Đèn cạn dầu sẽ tắt; Bóng Mực hút dầu của đèn yếu. Tỏa sáng (F) để xua chúng đi.</p>
+      <div class="buttons">
+        <button id="btn-start">Bắt đầu</button>
+        <button id="btn-board" class="secondary">Bảng xếp hạng</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="end" hidden>
+    <div class="card">
+      <h1 id="end-title">Đảo đã sáng!</h1>
+      <p id="end-reason"></p>
+      <p id="end-score"></p>
+      <form id="lb-form" autocomplete="off">
+        <label for="lb-name">Lưu điểm vào bảng xếp hạng:</label>
+        <div class="row">
+          <input id="lb-name" maxlength="12" placeholder="Tên (3–12 ký tự)" aria-describedby="lb-msg">
+          <button type="submit" id="lb-save">Lưu</button>
+        </div>
+        <p id="lb-msg" class="msg" role="status"></p>
+      </form>
+      <ol id="lb-end-list" class="board" hidden></ol>
+      <div class="buttons">
+        <button id="btn-restart">Chơi lại (R)</button>
+        <button id="btn-end-board" class="secondary">Bảng xếp hạng</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="board" hidden>
+    <div class="card">
+      <h1>Bảng xếp hạng</h1>
+      <ol id="lb-list" class="board"></ol>
+      <p id="lb-board-msg" class="msg"></p>
+      <button id="btn-board-back">Quay lại</button>
+    </div>
+  </div>
+
+  <div id="error" hidden></div>
+  <script type="module" src="./src/render/main.js"></script>
+</body>
+</html>
