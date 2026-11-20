@@ -1,0 +1,29 @@
+{
+  "random_motes": false,
+  "random_shades": false,
+  "motes": [],
+  "shades": [
+    {
+      "id": "S1",
+      "pos": [
+        0,
+        0,
+        10
+      ],
+      "state": "chase"
+    }
+  ],
+  "player": {
+    "pos": [
+      0,
+      0,
+      23
+    ]
+  },
+  "lanterns": [
+    {
+      "id": "L1",
+      "lit": true
+    }
+  ]
+}

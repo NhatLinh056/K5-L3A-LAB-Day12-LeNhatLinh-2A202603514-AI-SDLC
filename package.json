@@ -1,0 +1,24 @@
+{
+  "name": "dao-den-long",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Đảo Đèn Lồng – game 3D (Day 12 AI SDLC Lab - Lê Nhật Linh - 2A202603514)",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test",
+    "headless": "node src/headless.js",
+    "start": "node tools/serve.js",
+    "soak": "node --expose-gc src/soak.js",
+    "bench": "node tools/bench.js",
+    "dist": "node tools/dist.js"
+  },
+  "dependencies": {
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "playwright": "1.65.1"
+  }
+}

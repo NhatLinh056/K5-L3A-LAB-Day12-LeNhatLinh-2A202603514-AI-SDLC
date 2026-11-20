@@ -1,0 +1,29 @@
+{
+  "random_motes": false,
+  "random_shades": false,
+  "motes": [],
+  "shades": [
+    {
+      "id": "S1",
+      "pos": [
+        0,
+        0,
+        21
+      ]
+    }
+  ],
+  "player": {
+    "pos": [
+      0,
+      0,
+      0
+    ]
+  },
+  "lanterns": [
+    {
+      "id": "L1",
+      "lit": true,
+      "fuel": 20
+    }
+  ]
+}
